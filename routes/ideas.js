@@ -5,23 +5,22 @@ const mongoose = require('mongoose');
 require('../models/idea');
 const Idea = mongoose.model('ideas');
 
+require('../models/comment');
+const Comment = mongoose.model('comment');
+
 const {ensureAuthenticated} = require('../helpers/auth');
 
-//getting the idea page
-router.get('/', ensureAuthenticated, (req, res) => {
+router.get('/', ensureAuthenticated, async(req, res) => {
     console.log("/", req.user.firstUser);
-    Idea.find({
-        user: req.user.id //this is from passport.js
-    })
-        .sort({date: 'desc'})
-        .then((ideas) => {
-            res.render('ideas/index', {
-                ideas: ideas,
-
-            });
+    let ideas=await Idea.find({}) .sort({date: 'desc'});
+    let comments=await Comment.find({});
+    res.render('ideas/index', {
+        ideas: ideas,
+        comments:comments
+    });
 
 
-        })
+
 });
 
 router.get('/add', ensureAuthenticated, (req, res) => {
@@ -35,11 +34,93 @@ router.get('/add', ensureAuthenticated, (req, res) => {
 
 });
 
+router.post('/add_comment', ensureAuthenticated, (req, res) => {
+    let errors = [];
+    if (!req.body.comment) {
+        errors.push({text: "title required"});
+    }
+    if (errors.length > 0) {
+        console.log(errors);
+        res.render('ideas/add', {
+            errors: errors,
+            title: req.body.title,
+            details: req.body.details
+        });
+    }
+    else {
+        const newComment = {
+            text: req.body.comment,
+            idea: req.body.idea_id,
+            user: req.user.id,
+            name:req.user.name//from passport.js
+        };
+        console.log(req.user.name);
+
+        new Comment(newComment).save().then(() => {
+
+            req.flash("success_msg", "comment Successfully Added");
+
+            res.redirect('/ideas');
+        })
 
 
+    }
 
 
-//this is for process form
+});
+
+router.post('/delete_comment', ensureAuthenticated, (req, res) => {
+    let errors = [];
+    if (!req.body.comment) {
+        errors.push({text: "title required"});
+    }
+    if (errors.length > 0) {
+        console.log(errors);
+        res.render('ideas/add', {
+            errors: errors,
+            title: req.body.title,
+            details: req.body.details
+        });
+    }
+    else {
+        const newComment = {
+            text: req.body.comment,
+            idea: req.body.idea_id,
+            user: req.user.id,
+            name:req.user.name//from passport.js
+        };
+        console.log(req.user.name);
+
+        new Comment(newComment).save().then(() => {
+
+            req.flash("success_msg", "comment Successfully Added");
+
+            res.redirect('/ideas');
+        })
+
+
+    }
+
+
+});
+
+router.post('/edit_comment', ensureAuthenticated, async (req, res) => {
+
+    await Comment.findOne({
+        _id: req.body.comment_id,
+        user: req.user.id
+    })
+        .then(comment => {
+            comment.text = req.body.comment;
+            comment.save()
+                .then(() => {
+                    req.flash("success_msg", "successfully updated");
+                    res.redirect('/ideas');
+                })
+        })
+
+});
+
 router.post('/add', (req, res) => {
 
     let errors = [];
@@ -94,17 +175,15 @@ router.get('/edit/:id', ensureAuthenticated, (req, res) => {
 
 });
 
-
-router.put('/:id', ensureAuthenticated, (req, res) => {
-    Idea.findOne({
+router.put('/:id', ensureAuthenticated, async (req, res) => {
+    let ideas=await  Idea.findOne({
         _id: req.params.id,
         user: req.user.id
 
     })
         .then(idea => {
             idea.title = req.body.title;
-            idea.details = req.body.details
-
+            idea.details = req.body.details;
             idea.save()
                 .then(() => {
                     req.flash("success_msg", "successfully updated");
@@ -126,9 +205,5 @@ router.delete('/:id', ensureAuthenticated, (req, res) => {
         })
 
 });
-
-
-
-
 
 module.exports = router;

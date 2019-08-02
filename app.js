@@ -76,16 +76,13 @@ app.use(methodOverride('_method'));
 
 
 app.get('/', (req, res) => {
-    const title = "Vidjot By Tushar";
+    const title = "Rentomojo Idea App";
 
     return res.render('index', {
         title: title
     });
 });
-//about page
-app.get('/about', (req, res) => {
-    return res.render('about');
-});
+
 
 
 //normal method to delete value

@@ -1,8 +1,7 @@
 <%- include('../partials/header.ejs') %>
 <%- include('../partials/_navbar.ejs') %>
 <div class="container">
-
-
+    <!-- Modal -->
 
     <% if(success_msg.length > 0){ %>
 
@@ -23,34 +22,88 @@
     <%if(!user.firstUser){%>
     <div class="card card-body mb-4  text-center">
         <div class="mb-2" style="border-radius: 100px;margin:auto">
-            <div class="" style="background-image:url('<%=user.image%>'); width: 100px; height: 100px; background-position: center;background-size: contain" >
-                <div class="imageArea" onmouseover="overlay()">
-
-                </div>
-            </div>
-
-
         </div>
         <h2 class="mb-2">Welcome <%=user.name %></h2>
         <p style="color: darkgrey"><%=user.email %></p>
         <a style="width:100px" class="btn btn-dark mb-2 main-button" href="/ideas/add/">Add Idea</a>
-
     </div>
     <%}%>
 
 
     <% count = 0 %>
     <% ideas.forEach(function (idea) { %>
-
     <div class="card card-body mb-3">
         <h4><%= idea.title %></h4>
         <p style="color: darkgrey"><%- idea.details %></p>
+        <span style="color: darkgrey;font-size: 11px"> By- <%- user.name %></span>
+        <span style="color: darkgrey;font-size: 11px"> Created on- <%- idea.date %></span>
+        <br>
+        <%if(user._id==idea.user){%>
         <a style="width:100px" class="btn btn-dark mb-2" href="/ideas/edit/<%= idea.id %>">Edit</a>
+
         <form action="/ideas/<%= idea.id %>?_method=DELETE" method="post" style="width:100%">
             <!--<a type="submit" href="/delete/idea.id" class="btn btn-danger" >Delete</a>-->
             <input type="hidden" name="_method" value="DELETE">
             <button type="submit" class="btn btn-danger" style="width:100px">Delete</button>
         </form>
+        <%}%>
+        <br>
+
+        <div class="comments">
+            <img src="https://cdn2.iconfinder.com/data/icons/picons-basic-2/57/basic2-004_comment_chat-512.png" style="width:30px;height: 30px">
+            <strong><p class="mb-2">Comments</p></strong>
+        <% comments.forEach(function (comment) { %>
+            <% if(comment.idea==idea.id){%>
+                <span style="color: black"><%- comment.text %></span>
+                <span style="color: darkgrey;font-size: 11px"> By- <%- comment.name %></span>
+                    <span style="color: darkgrey;font-size: 11px"> Created on- <%- comment.date %></span>
+                    <%if(user._id==comment.user){%>
+                    <form action="/ideas/delete_comment" method="post" style="width:100%">
+                        <!--<a type="submit" href="/delete/idea.id" class="btn btn-danger" >Delete</a>-->
+                        <input type="submit" class="" style="width:50px;font-size: 9px" value="Remove">
+                        <input type="hidden" value="<%= comment.id %>"  name="comment_id"/>
+                    </form>
+                        <input type="submit" data-toggle="modal" data-target="#exampleModal" style="width:50px;font-size: 9px" value="Edit">
+
+                        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Edit Comment</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+
+                                    <div class="modal-body">
+                                        <form action="/ideas/edit_comment" method="post">
+                                            <div class="form-group">
+                                                <input type="text" class="form-control" name="comment" value="<%= comment.text%>">
+                                                <input type="hidden"  name="comment_id" value="<%= comment.id%>" >
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                <%}%>
+                <br>
+            <%}%>
+        <%})%>
+
+        <form action="/ideas/add_comment" method="post">
+            <div class="form-group">
+                <label for="title">Add comment</label>
+                <input type="text" class="form-control" name="comment" value="">
+                <input type="hidden" value="<%= idea.id %>"  name="idea_id"/>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
     </div>
 
     <% }) %>
