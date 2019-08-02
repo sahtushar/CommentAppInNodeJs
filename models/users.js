@@ -33,10 +33,6 @@ const UserSchema = new Schema({
         default:true
     }
 
-
-
-
-
 });
 
 mongoose.model("users", UserSchema);

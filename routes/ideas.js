@@ -153,10 +153,7 @@ router.post('/add', (req, res) => {
 
             res.redirect('/ideas');
         })
-
-
     }
-
 
 });
 
