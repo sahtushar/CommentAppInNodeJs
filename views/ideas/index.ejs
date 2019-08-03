@@ -1,5 +1,12 @@
 <%- include('../partials/header.ejs') %>
 <%- include('../partials/_navbar.ejs') %>
+<script>
+        function bindValues(text,id) {
+            document.querySelector("#edit-comment-text").value=text;
+            document.querySelector("#edit-comment-id").value=id;
+        }
+</script>
+
 <div class="container">
     <!-- Modal -->
 
@@ -33,9 +40,9 @@
     <% count = 0 %>
     <% ideas.forEach(function (idea) { %>
     <div class="card card-body mb-3">
-        <h4><%= idea.title %></h4>
-        <p style="color: darkgrey"><%- idea.details %></p>
-        <span style="color: darkgrey;font-size: 11px"> By- <%- user.name %></span>
+        <h4 style="color: brown"><%= idea.title %></h4>
+        <p><%- idea.details %></p>
+        <span style="color: darkgrey;font-size: 11px"> By- <%- idea.name %></span>
         <span style="color: darkgrey;font-size: 11px"> Created on- <%- idea.date %></span>
         <br>
         <%if(user._id==idea.user){%>
@@ -48,14 +55,15 @@
         </form>
         <%}%>
         <br>
+        <img src="https://cdn2.iconfinder.com/data/icons/picons-basic-2/57/basic2-004_comment_chat-512.png" style="width:50px;height: 50px">
+        <div class="comments card">
 
-        <div class="comments">
-            <img src="https://cdn2.iconfinder.com/data/icons/picons-basic-2/57/basic2-004_comment_chat-512.png" style="width:30px;height: 30px">
             <strong><p class="mb-2">Comments</p></strong>
         <% comments.forEach(function (comment) { %>
             <% if(comment.idea==idea.id){%>
-                <span style="color: black"><%- comment.text %></span>
-                <span style="color: darkgrey;font-size: 11px"> By- <%- comment.name %></span>
+                    <span style="color: brown;font-size: 15px"> <%- comment.name %></span>
+                    <span style="color: black"><%- comment.text %></span>
+
                     <span style="color: darkgrey;font-size: 11px"> Created on- <%- comment.date %></span>
                     <%if(user._id==comment.user){%>
                     <form action="/ideas/delete_comment" method="post" style="width:100%">
@@ -63,8 +71,7 @@
                         <input type="submit" class="" style="width:50px;font-size: 9px" value="Remove">
                         <input type="hidden" value="<%= comment.id %>"  name="comment_id"/>
                     </form>
-                        <input type="submit" data-toggle="modal" data-target="#exampleModal" style="width:50px;font-size: 9px" value="Edit">
-
+                        <input type="submit" data-toggle="modal" onclick="bindValues('<%= comment.text%>','<%= comment.id%>')" data-target="#exampleModal" style="width:50px;font-size: 9px" value="Edit">
                         <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
@@ -78,8 +85,8 @@
                                     <div class="modal-body">
                                         <form action="/ideas/edit_comment" method="post">
                                             <div class="form-group">
-                                                <input type="text" class="form-control" name="comment" value="<%= comment.text%>">
-                                                <input type="hidden"  name="comment_id" value="<%= comment.id%>" >
+                                                <input type="text" class="form-control" name="comment" id="edit-comment-text" value="">
+                                                <input type="hidden"  name="comment_id" id="edit-comment-id" value="" >
                                             </div>
                                             <button type="submit" class="btn btn-primary">Submit</button>
                                         </form>

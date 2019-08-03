@@ -17,7 +17,11 @@ const Schema= mongoose.Schema;
      date:{
          type:Date,
          default:Date.now()
-     }
+     },
+     name:{
+         type:String,
+         required:false
+     },
  })
 
 mongoose.model('ideas', IdeaSchema);
