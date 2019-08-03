@@ -177,6 +177,7 @@ router.delete('/:id', ensureAuthenticated, async(req, res) => {
         idea: id
     });
     //deleting all comments
+    console.log(comment);
     for (let i = 0; i < comment.length; i++)
     {
         await Comment.findOneAndDelete({
